@@ -1,39 +1,273 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-  <title>Reflex Game</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reflex Neon</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    height:100vh;
+    background:
+    radial-gradient(circle at top,#18003d,#050014 70%);
+    overflow:hidden;
+    color:white;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.container{
+    width:100%;
+    max-width:1400px;
+    text-align:center;
+}
+
+.top{
+    display:flex;
+    justify-content:space-between;
+    padding:20px 60px;
+}
+
+.card{
+    width:220px;
+    padding:20px;
+    border-radius:20px;
+    border:2px solid #7a00ff;
+    box-shadow:0 0 20px #7a00ff;
+    background:rgba(255,255,255,0.03);
+}
+
+.card h2{
+    font-size:20px;
+    margin-bottom:10px;
+    color:#ff4cff;
+}
+
+.card span{
+    font-size:50px;
+    font-weight:bold;
+}
+
+#mainArrow{
+    font-size:260px;
+    margin-top:20px;
+    text-shadow:
+    0 0 10px #fff,
+    0 0 20px #00aaff,
+    0 0 40px #00aaff,
+    0 0 80px #00aaff;
+    animation:pulse 1s infinite;
+}
+
+@keyframes pulse{
+    0%{transform:scale(1);}
+    50%{transform:scale(1.08);}
+    100%{transform:scale(1);}
+}
+
+.text{
+    margin-top:20px;
+    font-size:32px;
+    letter-spacing:2px;
+}
+
+.keys{
+    margin-top:70px;
+
+    display:flex;
+    justify-content:center;
+    gap:40px;
+    flex-wrap:wrap;
+}
+
+.key{
+    width:240px;
+    height:240px;
+
+    border-radius:35px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:130px;
+    font-weight:bold;
+
+    transition:0.15s;
+
+    user-select:none;
+}
+
+.key.active{
+    transform:scale(1.12);
+}
+
+.left{
+    border:4px solid #b300ff;
+    box-shadow:0 0 25px #b300ff;
+}
+
+.down{
+    border:4px solid #0077ff;
+    box-shadow:0 0 25px #0077ff;
+}
+
+.up{
+    border:4px solid #00ff88;
+    box-shadow:0 0 25px #00ff88;
+}
+
+.right{
+    border:4px solid #ff0077;
+    box-shadow:0 0 25px #ff0077;
+}
+
+.bottomText{
+    margin-top:50px;
+    font-size:28px;
+    opacity:0.8;
+}
+
+.combo{
+    color:#ff4cff;
+    margin-top:10px;
+    font-size:30px;
+}
+
+</style>
 </head>
+
 <body>
 
-<h1 id="arrow">⬆️</h1>
-<p>Pontos: <span id="score">0</span></p>
+<div class="container">
+
+    <div class="top">
+
+        <div class="card">
+            <h2>PONTOS</h2>
+            <span id="score">0</span>
+        </div>
+
+        <div class="card">
+            <h2>RECORDE</h2>
+            <span id="record">0</span>
+        </div>
+
+    </div>
+
+    <div id="mainArrow">⬆</div>
+
+    <div class="text">
+        PRESSIONE A TECLA CORRESPONDENTE
+    </div>
+
+    <div class="combo">
+        SEQUÊNCIA: <span id="combo">0</span>
+    </div>
+
+    <div class="keys">
+
+        <div class="key left" id="ArrowLeft">⬅</div>
+        <div class="key down" id="ArrowDown">⬇</div>
+        <div class="key up" id="ArrowUp">⬆</div>
+        <div class="key right" id="ArrowRight">➡</div>
+
+    </div>
+
+    <div class="bottomText">
+        Acerte o mais rápido possível ⚡
+    </div>
+
+</div>
 
 <script>
-const arrows = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
+
+const arrows = [
+    "ArrowUp",
+    "ArrowDown",
+    "ArrowLeft",
+    "ArrowRight"
+];
+
 const emojis = {
-  ArrowUp: "⬆️",
-  ArrowDown: "⬇️",
-  ArrowLeft: "⬅️",
-  ArrowRight: "➡️"
+    ArrowUp:"⬆",
+    ArrowDown:"⬇",
+    ArrowLeft:"⬅",
+    ArrowRight:"➡"
 };
 
 let current = "";
 let score = 0;
+let combo = 0;
+let record = localStorage.getItem("record") || 0;
 
-function newArrow() {
-  current = arrows[Math.floor(Math.random() * arrows.length)];
-  document.getElementById("arrow").innerText = emojis[current];
+document.getElementById("record").innerText = record;
+
+function newArrow(){
+
+    current = arrows[Math.floor(Math.random()*arrows.length)];
+
+    document.getElementById("mainArrow").innerText =
+    emojis[current];
+
 }
 
-document.addEventListener("keydown", (e) => {
-  if (e.key === current) {
-    score++;
+function flash(key){
+
+    const btn = document.getElementById(key);
+
+    btn.classList.add("active");
+
+    setTimeout(()=>{
+        btn.classList.remove("active");
+    },120);
+
+}
+
+document.addEventListener("keydown",(e)=>{
+
+    flash(e.key);
+
+    if(e.key === current){
+
+        score++;
+        combo++;
+
+        if(score > record){
+            record = score;
+            localStorage.setItem("record",record);
+        }
+
+    }else{
+
+        combo = 0;
+
+        if(score > 0){
+            score--;
+        }
+
+    }
+
     document.getElementById("score").innerText = score;
+    document.getElementById("combo").innerText = combo;
+    document.getElementById("record").innerText = record;
+
     newArrow();
-  }
+
 });
 
 newArrow();
+
 </script>
 
 </body>
