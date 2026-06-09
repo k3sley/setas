@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reflex Game</title>
+</head>
+<body>
+
+<h1 id="arrow">⬆️</h1>
+<p>Pontos: <span id="score">0</span></p>
+
+<script>
+const arrows = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
+const emojis = {
+  ArrowUp: "⬆️",
+  ArrowDown: "⬇️",
+  ArrowLeft: "⬅️",
+  ArrowRight: "➡️"
+};
+
+let current = "";
+let score = 0;
+
+function newArrow() {
+  current = arrows[Math.floor(Math.random() * arrows.length)];
+  document.getElementById("arrow").innerText = emojis[current];
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === current) {
+    score++;
+    document.getElementById("score").innerText = score;
+    newArrow();
+  }
+});
+
+newArrow();
+</script>
+
+</body>
+</html>
