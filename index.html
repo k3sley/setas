@@ -63,6 +63,7 @@ body{
 #mainArrow{
     font-size:260px;
     margin-top:20px;
+
     text-shadow:
     0 0 10px #fff,
     0 0 20px #00aaff,
@@ -166,13 +167,13 @@ body{
         </div>
 
         <div class="card">
-            <h2>TEMPO</h2>
-            <span id="time">0ms</span>
+            <h2>SEQUÊNCIA</h2>
+            <span id="combo">0</span>
         </div>
 
         <div class="card">
-            <h2>MELHOR</h2>
-            <span id="best">0ms</span>
+            <h2>TEMPO</h2>
+            <span id="time">0ms</span>
         </div>
 
     </div>
@@ -193,7 +194,7 @@ body{
     </div>
 
     <div class="bottomText">
-        Acerte o mais rápido possível ⚡
+        Acima de 2000ms conta como erro ⚡
     </div>
 
 </div>
@@ -216,18 +217,13 @@ const emojis = {
 
 let current = "";
 
+let combo = 0;
+
 let record = localStorage.getItem("record") || 0;
-let bestTime = localStorage.getItem("bestTime") || 9999;
 
 let startTime = 0;
 
 document.getElementById("record").innerText = record;
-
-if(bestTime == 9999){
-    document.getElementById("best").innerText = "0ms";
-}else{
-    document.getElementById("best").innerText = bestTime + "ms";
-}
 
 function newArrow(){
 
@@ -260,31 +256,37 @@ document.addEventListener("keydown",(e)=>{
 
     const reaction = Date.now() - startTime;
 
-    if(e.key === current){
+    if(e.key === current && reaction <= 2000){
 
-        record++;
+        combo++;
 
-        if(reaction < bestTime){
+        if(combo > record){
 
-            bestTime = reaction;
+            record = combo;
 
-            localStorage.setItem("bestTime", bestTime);
+            localStorage.setItem("record", record);
 
         }
-
-        localStorage.setItem("record", record);
-
-        document.getElementById("record").innerText = record;
 
         document.getElementById("time").innerText =
         reaction + "ms";
 
-        document.getElementById("best").innerText =
-        bestTime + "ms";
+    }else{
 
-        newArrow();
+        combo = 0;
+
+        document.getElementById("time").innerText =
+        "ERRO";
 
     }
+
+    document.getElementById("combo").innerText =
+    combo;
+
+    document.getElementById("record").innerText =
+    record;
+
+    newArrow();
 
 });
 
