@@ -34,12 +34,14 @@ body{
 
 .top{
     display:flex;
-    justify-content:space-between;
-    padding:20px 60px;
+    justify-content:center;
+    gap:30px;
+    padding:20px 40px;
+    flex-wrap:wrap;
 }
 
 .card{
-    width:220px;
+    width:250px;
     padding:20px;
     border-radius:20px;
     border:2px solid #7a00ff;
@@ -48,7 +50,7 @@ body{
 }
 
 .card h2{
-    font-size:20px;
+    font-size:22px;
     margin-bottom:10px;
     color:#ff4cff;
 }
@@ -66,13 +68,24 @@ body{
     0 0 20px #00aaff,
     0 0 40px #00aaff,
     0 0 80px #00aaff;
+
     animation:pulse 1s infinite;
 }
 
 @keyframes pulse{
-    0%{transform:scale(1);}
-    50%{transform:scale(1.08);}
-    100%{transform:scale(1);}
+
+    0%{
+        transform:scale(1);
+    }
+
+    50%{
+        transform:scale(1.08);
+    }
+
+    100%{
+        transform:scale(1);
+    }
+
 }
 
 .text{
@@ -138,12 +151,6 @@ body{
     opacity:0.8;
 }
 
-.combo{
-    color:#ff4cff;
-    margin-top:10px;
-    font-size:30px;
-}
-
 </style>
 </head>
 
@@ -154,13 +161,18 @@ body{
     <div class="top">
 
         <div class="card">
-            <h2>PONTOS</h2>
-            <span id="score">0</span>
+            <h2>RECORDE</h2>
+            <span id="record">0</span>
         </div>
 
         <div class="card">
-            <h2>RECORDE</h2>
-            <span id="record">0</span>
+            <h2>TEMPO</h2>
+            <span id="time">0ms</span>
+        </div>
+
+        <div class="card">
+            <h2>MELHOR</h2>
+            <span id="best">0ms</span>
         </div>
 
     </div>
@@ -169,10 +181,6 @@ body{
 
     <div class="text">
         PRESSIONE A TECLA CORRESPONDENTE
-    </div>
-
-    <div class="combo">
-        SEQUÊNCIA: <span id="combo">0</span>
     </div>
 
     <div class="keys">
@@ -207,11 +215,19 @@ const emojis = {
 };
 
 let current = "";
-let score = 0;
-let combo = 0;
+
 let record = localStorage.getItem("record") || 0;
+let bestTime = localStorage.getItem("bestTime") || 9999;
+
+let startTime = 0;
 
 document.getElementById("record").innerText = record;
+
+if(bestTime == 9999){
+    document.getElementById("best").innerText = "0ms";
+}else{
+    document.getElementById("best").innerText = bestTime + "ms";
+}
 
 function newArrow(){
 
@@ -220,11 +236,15 @@ function newArrow(){
     document.getElementById("mainArrow").innerText =
     emojis[current];
 
+    startTime = Date.now();
+
 }
 
 function flash(key){
 
     const btn = document.getElementById(key);
+
+    if(!btn) return;
 
     btn.classList.add("active");
 
@@ -238,31 +258,33 @@ document.addEventListener("keydown",(e)=>{
 
     flash(e.key);
 
+    const reaction = Date.now() - startTime;
+
     if(e.key === current){
 
-        score++;
-        combo++;
+        record++;
 
-        if(score > record){
-            record = score;
-            localStorage.setItem("record",record);
+        if(reaction < bestTime){
+
+            bestTime = reaction;
+
+            localStorage.setItem("bestTime", bestTime);
+
         }
 
-    }else{
+        localStorage.setItem("record", record);
 
-        combo = 0;
+        document.getElementById("record").innerText = record;
 
-        if(score > 0){
-            score--;
-        }
+        document.getElementById("time").innerText =
+        reaction + "ms";
+
+        document.getElementById("best").innerText =
+        bestTime + "ms";
+
+        newArrow();
 
     }
-
-    document.getElementById("score").innerText = score;
-    document.getElementById("combo").innerText = combo;
-    document.getElementById("record").innerText = record;
-
-    newArrow();
 
 });
 
